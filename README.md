@@ -1,4 +1,4 @@
-a framework is proposed for one-class feature extraction. The proposed framework divides the original feature space into two orthogonal
+A framework is proposed for one-class feature extraction. The proposed framework divides the original feature space into two orthogonal
 spaces namely the principal space and the complementary space. The principal space is used to learn the features of the target class, and
 the complementary space is used to learn the features of the abnormal class. The features that are extracted from the two spaces are
 fused as the final extracted one-class feature of the original feature space. Furthermore, a specific implementation method, complete
