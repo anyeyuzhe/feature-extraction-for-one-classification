@@ -1,66 +1,9 @@
-% feature-extraction-for-one-classification
-%A one-class feature extraction method based on space decomposition
-load iris
-n1=50;
-% load warpAR10P
-% n1=13; %%% n1 is the number of target class
-sample=data(:,2:end);
-
-n2=round(n1*2/3);
-n3=size(sample,1);
-
-index=randperm(n1);
-data1=sample(index(1:n2),1:end);%%% Training set
-data2=[sample(index(n2+1:end),1:end);sample(n1+1:n3,:)];%%%% Test set
-[coeff1,score,latent,tsquared,explained1,mu1] = pca(data1); 
-
-%%%% Choose the optimal number of principal components
-s=0;
-for i=1:1:length(explained1)
-    s=s+explained1(i);
-    if s>=95  
-        break;
-    end
-end
-
-%%%%% Calculate the feature of the complement space for test set
-cp=i;
-A=coeff1(:,1:cp);
-bb=pinv(A')*A';
-X2=data2;
-Xx=X2-repmat(mu1,size(X2,1),1);
-s3=bb*Xx';
-xn=Xx'-s3;
-n=[];
-for i=1:1:size(Xx,1)
-    uu=[norm(xn(:,i),1)];
-    n=[n;uu];
-end
-%%%%%
-sco=Xx*coeff1;
-dd=[sco(:,1:cp) n];%%% The  extracted one-class feature vector of the test set
-
-%%%%% Calculate the feature of the complement space for training set
-X2=data1;
-Xx=X2-repmat(mu1,size(X2,1),1);
-s3=bb*Xx';
-xn=Xx'-s3;
-n=[];
-for i=1:1:size(Xx,1)
-    uu=[norm(xn(:,i),1)];
-    n=[n;uu];
-end
-sco=Xx*coeff1;
-DD=[sco(:,1:cp) n];%%%% The  extracted one-class feature vector of the training set
-y=ones(size(DD,1),1);
-
-d1 = mahal(dd,DD); % Mahalanobis distance of CPCA feature in test set
-d2 = mahal(dd(:,1:cp),DD(:,1:cp));%%%% Mahalanobis distance of PCA featue in test set
-
-label=zeros(n3-n2,1);
-label(1:n1-n2)=1;
-predictt=d1;
-ground_truth =label;
-[auc1]= plot_roc(-d1, ground_truth );
-hold on
-[auc2]= plot_roc(-d2, ground_truth );
+a framework is proposed for one-class feature extraction. The proposed framework divides the original feature space into two orthogonal
+spaces namely the principal space and the complementary space. The principal space is used to learn the features of the target class, and
+the complementary space is used to learn the features of the abnormal class. The features that are extracted from the two spaces are
+fused as the final extracted one-class feature of the original feature space. Furthermore, a specific implementation method, complete
+principal component analysis (CPCA), is proposed. First, CPCA conducts principal component analysis (PCA) to calculate the projection
+scores of the target class samples in the principal space. Then, according to the projection vectors of the principal components
+(obtained in the principal space), the corresponding complementary space is constructed. The projection of the sample in the
+complementary space is calculated and transformed into the first-order norm as the extracted feature in the complementary space. Dataset
+of iris and warpAR10P are used to verify the effect of this proposed method. 
